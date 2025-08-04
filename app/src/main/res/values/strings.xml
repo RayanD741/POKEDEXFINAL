@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">POKEDEX_FINAL</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="pok_dex">Pokédex</string>
+    <string name="favoris">Favoris</string>
+    <string name="param_tres">Paramètres</string>
+    <string name="image_pokemon">Image du Pokémon</string>
+    <string name="nom">Nom</string>
+    <string name="filtrer">Filtrer</string>
+    <string name="filtrer_par_type">Filtrer par Type</string>
+    <string name="filtrer_par_g_n_ration">Filtrer par Génération</string>
+    <string name="intervalle_de_poids_kg">Intervalle de Poids (kg)</string>
+    <string name="min">Min</string>
+    <string name="intervalle_de_taille_m">Intervalle de Taille (m)</string>
+    <string name="taille_min_m">Taille min (m)</string>
+    <string name="taille_max_m">Taille max (m)</string>
+    <string name="poids_min_kg">Poids min (kg)</string>
+    <string name="poids_max_kg">Poids max (kg)</string>
+    <string name="appliquer_les_filtres">Appliquer les filtres</string>
+
+</resources>

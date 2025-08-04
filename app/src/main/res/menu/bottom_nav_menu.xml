@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_pokedex"
+        android:title="@string/pok_dex"
+        android:icon="@drawable/ic_pokedex" />
+
+    <item
+        android:id="@+id/menu_favoris"
+        android:title="@string/favoris"
+        android:icon="@drawable/ic_favoris" />
+
+    <item
+        android:id="@+id/nav_filtrer"
+        android:icon="@drawable/ic_filter"
+        android:title="@string/filtrer"
+        />
+
+</menu>
