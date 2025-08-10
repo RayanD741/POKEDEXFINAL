@@ -56,7 +56,8 @@ public class DBUtil extends SQLiteOpenHelper {
 
         values.put(COL_POIDS, p.getPoidsEnKilo());
         values.put(COL_TAILLE, p.getTailleEnMetre());
-        values.put(COL_TYPE, p.getPremierType());
+        values.put(COL_TYPE, p.getType());
+
 
         db.insert(TABLE_FAVORIS, null, values);
         db.close();
