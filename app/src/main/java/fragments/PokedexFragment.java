@@ -31,7 +31,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PokedexFragment extends Fragment {
-
+//je suis done
     private RecyclerView recyclerView;
     private PokemonAdapter adapter;
     private List<Pokemon> listePokemon = new ArrayList<>();
