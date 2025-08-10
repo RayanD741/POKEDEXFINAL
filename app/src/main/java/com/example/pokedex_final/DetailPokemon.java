@@ -37,19 +37,20 @@ public class DetailPokemon extends AppCompatActivity {
         btnFavori = findViewById(R.id.btnFavori);
 
         // Récupération de l'objet Pokemon
-        pokemon = (Pokemon) getIntent().getSerializableExtra(PokemonAdapter.EXTRA_POKEMON_ID);
+        pokemon = getIntent().getParcelableExtra(PokemonAdapter.EXTRA_POKEMON_ID);
         if (pokemon == null) {
             Toast.makeText(this, "Erreur : Pokémon introuvable", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
+
         // Remplir les champs
         nomPokemon.setText(pokemon.getNomFr());
         numeroPokemon.setText("#" + pokemon.getId());
         taillePokemon.setText(pokemon.getTailleEnMetre() + " m");
         poidsPokemon.setText(pokemon.getPoidsEnKilo() + " kg");
-        typePokemon.setText(pokemon.getPremierType());
+        typePokemon.setText(pokemon.getType());
 
         if (pokemon.getImageUrl() != null) {
             Picasso.get()

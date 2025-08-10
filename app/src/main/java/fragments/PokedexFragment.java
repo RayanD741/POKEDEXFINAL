@@ -54,6 +54,7 @@ public class PokedexFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerPokedex);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
+
         adapter = new PokemonAdapter(getContext(), listeFiltre);
         recyclerView.setAdapter(adapter);
 
@@ -114,7 +115,7 @@ public class PokedexFragment extends Fragment {
         listeFiltre.clear();
 
         for (Pokemon p : listePokemon) {
-            boolean matchType = typeSelectionne.equals("tous") || p.getPremierType().toLowerCase().equals(typeSelectionne);
+            boolean matchType = typeSelectionne.equals("tous") || p.getType().toLowerCase().equals(typeSelectionne);
             boolean matchPoids = p.getPoidsEnKilo() >= pMin && p.getPoidsEnKilo() <= pMax;
             boolean matchTaille = p.getTailleEnMetre() >= tMin && p.getTailleEnMetre() <= tMax;
 

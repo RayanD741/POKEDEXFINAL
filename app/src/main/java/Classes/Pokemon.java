@@ -1,111 +1,101 @@
 package Classes;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
-
-public class Pokemon implements Serializable {
+public class Pokemon implements Parcelable {
 
     private int id;
 
     @SerializedName("name")
-    private String nom;
+    private String nomEn;
 
-    private double height;  // en décimètres
-    private double weight;  // en hectogrammes
-    private String imageUrl;
+    @SerializedName("height")
+    private double tailleEnMetre;
+
+    @SerializedName("weight")
+    private double poidsEnKilo;
+
+    private String type; // version simplifiée, pour correspondre à ta DB
 
     private Sprites sprites;
 
-    private String premierType;
-    private String secondType;
-
-    public Pokemon(int id, String nom, double poids, double taille, String premierType, String secondType, Sprites sprites) {
-        this.id = id;
-        this.nom = nom;
-        this.weight = poids;
-        this.height = taille;
-        this.premierType = premierType;
-        this.secondType = secondType;
-        this.sprites = sprites;
-    }
-
+    // Constructeur utilisé pour créer un Pokemon avec un seul type (pour ta DB)
     public Pokemon(int id, String nom, String imageUrl, double poids, double taille, String type) {
         this.id = id;
-        this.nom = nom;
-        this.imageUrl = imageUrl;
-        this.weight = poids * 10;  // conversion inverse
-        this.height = taille * 10; // conversion inverse
-        this.premierType = type;
-        this.sprites = null;
+        this.nomEn = nom;
+        this.sprites = new Sprites(imageUrl);
+        this.poidsEnKilo = poids * 10;
+        this.tailleEnMetre = taille * 10;
+        this.type = type;
     }
 
+    // --- Getters ---
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getNomFr() {
-        return nom;
-    }
-
-    public void setNomFr(String nom) {
-        this.nom = nom;
+        return nomEn;
     }
 
     public double getTailleEnMetre() {
-        return height / 10.0;
+        return tailleEnMetre / 10.0;
     }
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
 
     public double getPoidsEnKilo() {
-        return weight / 10.0;
+        return poidsEnKilo / 10.0;
     }
 
-    public double getRawTaille() {
-        return height;
-    }
-
-    public double getRawPoids() {
-        return weight;
-    }
-
-    public void setRawTaille(double height) {
-        this.height = height;
-    }
-
-    public void setRawPoids(double weight) {
-        this.weight = weight;
-    }
-
-    public String getPremierType() {
-        return premierType;
-    }
-
-    public void setPremierType(String premierType) {
-        this.premierType = premierType;
-    }
-
-    public String getSecondType() {
-        return secondType;
-    }
-
-    public void setSecondType(String secondType) {
-        this.secondType = secondType;
+    public String getType() {
+        return type;
     }
 
     public Sprites getSprites() {
         return sprites;
     }
 
-    public void setSprites(Sprites sprites) {
-        this.sprites = sprites;
+    public String getImageUrl() {
+        return (sprites != null) ? sprites.getFrontDefault() : null;
     }
+
+    // Parcelable implementation
+
+    protected Pokemon(Parcel in) {
+        id = in.readInt();
+        nomEn = in.readString();
+        tailleEnMetre = in.readDouble();
+        poidsEnKilo = in.readDouble();
+        type = in.readString();
+        sprites = in.readParcelable(Sprites.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(nomEn);
+        dest.writeDouble(tailleEnMetre);
+        dest.writeDouble(poidsEnKilo);
+        dest.writeString(type);
+        dest.writeParcelable(sprites, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Pokemon> CREATOR = new Creator<Pokemon>() {
+        @Override
+        public Pokemon createFromParcel(Parcel in) {
+            return new Pokemon(in);
+        }
+
+        @Override
+        public Pokemon[] newArray(int size) {
+            return new Pokemon[size];
+        }
+    };
 }

@@ -76,7 +76,8 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
                 listener.onPokemonClick(pokemon);
             } else {
                 Intent intent = new Intent(context, DetailPokemon.class);
-                intent.putExtra(EXTRA_POKEMON_ID, pokemon.getId());
+                intent.putExtra(EXTRA_POKEMON_ID, pokemon);
+
                 context.startActivity(intent);
             }
         });
