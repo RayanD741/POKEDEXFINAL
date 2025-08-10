@@ -4,11 +4,22 @@
     android:padding="16dp">
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/layoutDetailContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
+        android:orientation="vertical"
         android:padding="8dp">
+
+        <!-- Bouton Retour -->
+        <Button
+            android:id="@+id/btnRetourDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:padding="8dp"
+            android:text="Retour"
+            android:textAllCaps="false" />
 
         <ImageView
             android:id="@+id/imagePokemon"
@@ -20,49 +31,50 @@
             android:id="@+id/nomPokemon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="Nom"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/numeroPokemon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="#000"
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/taillePokemon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
             android:text="Taille: -- m"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/poidsPokemon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
             android:text="Poids: -- kg"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/typesPokemon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:text="Type: --"
-            android:textSize="16sp"
-            android:layout_marginBottom="16dp" />
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnFavori"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ajouter aux favoris"
             android:padding="12dp"
+            android:text="Ajouter aux favoris"
             android:textAllCaps="false" />
+
     </LinearLayout>
 </ScrollView>

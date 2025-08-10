@@ -1,8 +1,10 @@
 package com.example.pokedex_final;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,12 +15,14 @@ import com.squareup.picasso.Picasso;
 import Classes.DBUtil;
 import Classes.Pokemon;
 import Classes.PokemonAdapter;
+import fragments.PokedexFragment;
 
 public class DetailPokemon extends AppCompatActivity {
 
     private ImageView imagePokemon;
     private TextView nomPokemon, numeroPokemon, taillePokemon, poidsPokemon, typePokemon;
     private Button btnFavori;
+
     private Pokemon pokemon;
     private DBUtil dbUtil;
 
@@ -35,14 +39,16 @@ public class DetailPokemon extends AppCompatActivity {
         poidsPokemon = findViewById(R.id.poidsPokemon);
         typePokemon = findViewById(R.id.typesPokemon);
         btnFavori = findViewById(R.id.btnFavori);
+        Button btnRetour = findViewById(R.id.btnRetourDetail);
+        btnRetour.setOnClickListener(v -> finish()); // ou autre action
 
-        // Récupération de l'objet Pokemon
         pokemon = getIntent().getParcelableExtra(PokemonAdapter.EXTRA_POKEMON_ID);
         if (pokemon == null) {
             Toast.makeText(this, "Erreur : Pokémon introuvable", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
+
 
 
         // Remplir les champs

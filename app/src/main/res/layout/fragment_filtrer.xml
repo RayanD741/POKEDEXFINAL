@@ -120,6 +120,14 @@
             android:layout_gravity="center_horizontal"
             android:padding="12dp"
             android:textAllCaps="false"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Résultats -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerFiltre"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
     </LinearLayout>
 </ScrollView>
