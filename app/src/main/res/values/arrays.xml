@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Types affichés en FR -->
+    <string-array name="types_pokemon">
+        <item>Tous</item>
+        <item>Normal</item>
+        <item>Feu</item>
+        <item>Eau</item>
+        <item>Plante</item>
+        <item>Électrik</item>
+        <item>Glace</item>
+        <item>Combat</item>
+        <item>Poison</item>
+        <item>Sol</item>
+        <item>Vol</item>
+        <item>Psy</item>
+        <item>Insecte</item>
+        <item>Roche</item>
+        <item>Spectre</item>
+        <item>Dragon</item>
+        <item>Ténèbres</item>
+        <item>Acier</item>
+        <item>Fée</item>
+    </string-array>
+
+    <string-array name="generations_pokemon">
+        <item>Toutes</item>
+        <item>Gen I</item>
+        <item>Gen II</item>
+        <item>Gen III</item>
+        <item>Gen IV</item>
+        <item>Gen V</item>
+        <item>Gen VI</item>
+        <item>Gen VII</item>
+        <item>Gen VIII</item>
+        <item>Gen IX</item>
+    </string-array>
+</resources>

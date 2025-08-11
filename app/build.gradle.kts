@@ -37,26 +37,26 @@ android {
 }
 
 dependencies {
-    // Libs versions from TOML
+    // Versions via TOML
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
 
-    // Networking (Retrofit + GSON)
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    // RecyclerView (nécessaire pour RecyclerView + GridLayoutManager)
+    implementation("androidx.recyclerview:recyclerview:1.3.2") // ou + récent
 
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.picasso:picasso:2.71828")
-    // Image loading (Picasso)
+    // Networking
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")         // 2.9.0 fonctionne aussi
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+    // Images
     implementation("com.squareup.picasso:picasso:2.71828")
 
     // SQLite helper
     implementation("androidx.sqlite:sqlite:2.3.1")
 
-    // Fragments & navigation (optionnel)
+    // Fragments (si tu en as besoin)
     implementation("androidx.fragment:fragment:1.6.2")
 
     // Tests
@@ -64,3 +64,4 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }
+

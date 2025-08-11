@@ -1,5 +1,6 @@
 package fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,11 +18,15 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pokedex_final.R;
+import android.widget.CheckBox;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import Classes.PokeApi;
 import Classes.Pokemon;
@@ -32,28 +37,35 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class FiltrerFragment extends Fragment {
 
     private Spinner spinnerType, spinnerGeneration;
     private EditText poidsMin, poidsMax, tailleMin, tailleMax;
     private Button btnAppliquer;
     private RecyclerView recyclerFiltre;
+    private CheckBox chkTriNumero;
 
     private static final int NOMBRE_TOTAL = 1025;
 
+    // listes existantes
     private final String[] types = {"Tous", "Feu", "Eau", "Plante", "Électrik", "Roche", "Spectre"};
     private final String[] generations = {"Toutes", "Gen I", "Gen II", "Gen III", "Gen IV", "Gen V", "Gen VI", "Gen VII", "Gen VIII", "Gen IX"};
 
     private PokemonAdapter adapter;
-    private final List<Pokemon> listeComplete = new ArrayList<>(); // tous les Pokémon chargés
-    private final List<Pokemon> listeAffichee = new ArrayList<>(); // liste filtrée affichée
+    private final List<Pokemon> listeComplete = new ArrayList<>();
+    private final List<Pokemon> listeAffichee = new ArrayList<>();
 
-    // ---- Critères courants (utilisés pour filtrer ce qui arrive de l’API) ----
-    private String curType = "tous";  // canonique, sans accents, en minuscules
-    private int curGenIdx = 0;        // 0 = toutes, 1..9
+    // critères courants
+    private String curType = "all";   // "all","fire","water",...
+    private int curGenIdx = 0;        // 0=toutes, 1..9
     private double curPmin = 0, curPmax = Double.MAX_VALUE;
     private double curTmin = 0, curTmax = Double.MAX_VALUE;
 
+    @SuppressLint("WrongViewCast")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -70,8 +82,9 @@ public class FiltrerFragment extends Fragment {
         tailleMax = v.findViewById(R.id.tailleMax);
         btnAppliquer = v.findViewById(R.id.btnAppliquer);
         recyclerFiltre = v.findViewById(R.id.recyclerFiltre);
+        chkTriNumero = v.findViewById(R.id.chkTriNumero);
 
-        // Spinners (évite getSelectedItem() = null)
+        // Spinners
         spinnerType.setAdapter(new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_dropdown_item, types));
         spinnerGeneration.setAdapter(new ArrayAdapter<>(requireContext(),
@@ -84,21 +97,24 @@ public class FiltrerFragment extends Fragment {
         adapter = new PokemonAdapter(getContext(), listeAffichee);
         recyclerFiltre.setAdapter(adapter);
 
-        // Actions
+        // CheckBox: tri immédiat quand on coche/décoche
+
+        chkTriNumero.setOnCheckedChangeListener((b, checked) -> appliquerFiltreSurListeComplete());
+
+        // Bouton "Appliquer"
         btnAppliquer.setOnClickListener(view -> {
-            // 1) mettre à jour les critères courants
-            curType   = canonType(safe(spinnerType.getSelectedItem()));
-            curGenIdx = generationIndexFromSelection(safe(spinnerGeneration.getSelectedItem()));
+            // maj critères
+            curType   = toTypeKey(spinnerType.getSelectedItem());                   // "all","fire",...
+            curGenIdx = generationIndexFromSelection(spinnerGeneration.getSelectedItem());
             curPmin   = parseOrDefault(textOf(poidsMin), 0);
             curPmax   = parseOrDefault(textOf(poidsMax), Double.MAX_VALUE);
             curTmin   = parseOrDefault(textOf(tailleMin), 0);
             curTmax   = parseOrDefault(textOf(tailleMax), Double.MAX_VALUE);
-
-            // 2) recalculer l’affichage à partir de la liste complète
+            // recalc complet
             appliquerFiltreSurListeComplete();
         });
 
-        // Charge tous les Pokémon (affiche selon critères courants — par défaut "Tous")
+        // Chargement API
         chargerPokemonDepuisAPI();
 
         return v;
@@ -120,13 +136,18 @@ public class FiltrerFragment extends Fragment {
                     if (response.isSuccessful() && response.body() != null) {
                         Pokemon p = response.body();
 
-                        // Toujours alimenter la liste complète
+                        // Toujours stocker le complet
                         listeComplete.add(p);
 
-                        // ✅ N’ajouter à l’affichage que si ça matche les critères courants
+                        // N’afficher que si ça match les critères courants
                         if (matchCurrentCriteria(p)) {
                             listeAffichee.add(p);
-                            adapter.notifyItemInserted(listeAffichee.size() - 1);
+                            if (chkTriNumero != null && chkTriNumero.isChecked()) {
+                                Collections.sort(listeAffichee, Comparator.comparingInt(Pokemon::getId));
+                                adapter.notifyDataSetChanged();
+                            } else {
+                                adapter.notifyItemInserted(listeAffichee.size() - 1);
+                            }
                         }
                     }
                 }
@@ -150,15 +171,19 @@ public class FiltrerFragment extends Fragment {
                 listeAffichee.add(p);
             }
         }
+
+        if (chkTriNumero != null && chkTriNumero.isChecked()) {
+            Collections.sort(listeAffichee, Comparator.comparingInt(Pokemon::getId));
+        }
         adapter.notifyDataSetChanged();
     }
 
     /** Teste les critères courants sur un Pokémon. */
     private boolean matchCurrentCriteria(Pokemon p) {
-        // Type
-        boolean okType = matchesType(p.getType(), curType);
+        // Type (clé canonique)
+        boolean okType = "all".equals(curType) || pokemonHasTypeKey(p, curType);
 
-        // Génération (depuis l’ID)
+        // Génération via ID
         int genOfId = generationIndexForId(p.getId());
         boolean okGen = (curGenIdx == 0) || (genOfId == curGenIdx);
 
@@ -173,77 +198,113 @@ public class FiltrerFragment extends Fragment {
 
     // -------- Helpers filtrage --------
 
-    // Compare le type sélectionné (canonique) avec les types du Pokémon (gère "Feu/Vol", "fire, flying", accents, etc.)
-    private boolean matchesType(String pokemonTypeRaw, String selectedTypeCanonical) {
-        if ("tous".equals(selectedTypeCanonical) || selectedTypeCanonical.isEmpty()) return true;
-        if (pokemonTypeRaw == null) return false;
+    private boolean pokemonHasTypeKey(Pokemon p, String key) {
+        if (p == null || key == null || "all".equals(key)) return true;
 
-        String[] parts = pokemonTypeRaw.split("[,/|\\s]+"); // sépare par , / | ou espace
-        for (String part : parts) {
-            if (canonType(part).equals(selectedTypeCanonical)) return true;
+        // 1) si tu as mis le nouveau Pokemon.java
+        try {
+            Set<String> keys = p.getCanonicalTypeKeys();
+            if (keys != null && keys.contains(key)) return true;
+        } catch (Throwable ignore) { /* fallback si ancien POJO */ }
+
+        // 2) fallback : parser l'ancien champ string p.getType()
+        String raw = p.getType();
+        if (raw == null) return false;
+        String[] tokens = normalize(raw).split("[^a-z]+");
+        for (String t : tokens) {
+            if (mapToKey(t).equals(key)) return true;
         }
         return false;
     }
 
-    // Met en forme un nom de type vers une clé canonique (français) sans accents
-    private String canonType(String s) {
-        String n = normalize(s);
+    private String toTypeKey(Object selected) {
+        String n = normalize(selected == null ? "" : selected.toString());
         switch (n) {
-            // Français natif
-            case "tous": return "tous";
-            case "feu": return "feu";
-            case "eau": return "eau";
-            case "plante": return "plante";
-            case "electrik": return "electrik"; // "Électrik" → "electrik"
-            case "roche": return "roche";
-            case "spectre": return "spectre";
-            // Équivalents anglais (au cas où l’API te renvoie en EN)
-            case "fire": return "feu";
-            case "water": return "eau";
-            case "grass": return "plante";
-            case "electric": return "electrik";
-            case "rock": return "roche";
-            case "ghost": return "spectre";
-        }
-        return n; // fallback (si tu ajoutes d’autres types plus tard)
-    }
-
-    private String normalize(String s) {
-        if (s == null) return "";
-        String noAccent = Normalizer.normalize(s, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}+", "");
-        return noAccent.trim().toLowerCase(Locale.ROOT);
-    }
-
-    // Convertit "Gen I" -> 1, "Gen II" -> 2 ... "Toutes" -> 0
-    private int generationIndexFromSelection(String sel) {
-        sel = normalize(sel);
-        if (sel.isEmpty() || "toutes".equals(sel)) return 0;
-        switch (sel) {
-            case "gen i":   return 1;
-            case "gen ii":  return 2;
-            case "gen iii": return 3;
-            case "gen iv":  return 4;
-            case "gen v":   return 5;
-            case "gen vi":  return 6;
-            case "gen vii": return 7;
-            case "gen viii":return 8;
-            case "gen ix":  return 9;
-            default: return 0;
+            case "tous": return "all";
+            case "feu": case "fire": return "fire";
+            case "eau": case "water": return "water";
+            case "plante": case "grass": return "grass";
+            case "electrik": case "electric": return "electric";
+            case "roche": case "rock": return "rock";
+            case "spectre": case "ghost": return "ghost";
+            default: return "all";
         }
     }
 
-    // Map ID -> génération (PokeAPI, jusqu’à 1025)
+    private String mapToKey(String n) {
+        switch (n) {
+            case "feu": case "fire": return "fire";
+            case "eau": case "water": return "water";
+            case "plante": case "grass": return "grass";
+            case "electrik": case "electric": return "electric";
+            case "roche": case "rock": return "rock";
+            case "spectre": case "ghost": return "ghost";
+            case "normal": return "normal";
+            case "glace": case "ice": return "ice";
+            case "combat": case "fighting": return "fighting";
+            case "poison": return "poison";
+            case "sol": case "ground": return "ground";
+            case "vol": case "flying": return "flying";
+            case "psy": case "psychic": return "psychic";
+            case "insecte": case "bug": return "bug";
+            case "dragon": return "dragon";
+            case "tenebres": case "ténèbres": case "dark": return "dark";
+            case "acier": case "steel": return "steel";
+            case "fee": case "fée": case "fairy": return "fairy";
+            default: return "";
+        }
+    }
+
+    private int generationIndexFromSelection(Object sel) {
+        String s = normalize(sel == null ? "" : sel.toString()); // ex: "gen i", "gen 1", "génération 3", "kanto"
+        if (s.contains("toute")) return 0; // "toutes", "toute"
+
+        // a) chiffre arabe (Gen 1, Génération 2, etc.)
+        Matcher m = Pattern.compile("(\\d+)").matcher(s);
+        if (m.find()) {
+            try {
+                int n = Integer.parseInt(m.group(1));
+                if (n >= 1 && n <= 9) return n;
+            } catch (NumberFormatException ignore) {}
+        }
+
+        // b) chiffres romains (i..ix) – on cherche le plus long d'abord
+        if (s.contains("IX"))   return 9;
+        if (s.contains("VIII")) return 8;
+        if (s.contains("VII"))  return 7;
+        if (s.contains("VI"))   return 6;
+        if (s.contains("V"))    return 5;
+        if (s.contains("IV"))   return 4;
+        if (s.contains("III"))  return 3;
+        if (s.contains("II"))   return 2;
+        if (s.contains("I"))   return 1;   // espace-i pour éviter de matcher "viii" etc.
+
+        // c) noms de régions
+        if (s.contains("kanto")) return 1;
+        if (s.contains("johto")) return 2;
+        if (s.contains("hoenn")) return 3;
+        if (s.contains("sinnoh")) return 4;
+        if (s.contains("unys") || s.contains("unova")) return 5;
+        if (s.contains("kalos")) return 6;
+        if (s.contains("alola")) return 7;
+        if (s.contains("galar")) return 8;
+        if (s.contains("paldea")) return 9;
+
+        // défaut
+        return 0;
+    }
+
+
     private int generationIndexForId(int id) {
-        if (id <= 151) return 1;           // Gen I
-        if (id <= 251) return 2;           // Gen II
-        if (id <= 386) return 3;           // Gen III
-        if (id <= 493) return 4;           // Gen IV
-        if (id <= 649) return 5;           // Gen V
-        if (id <= 721) return 6;           // Gen VI
-        if (id <= 809) return 7;           // Gen VII
-        if (id <= 905) return 8;           // Gen VIII
-        return 9;                           // Gen IX (906–1025)
+        if (id <= 151) return 1;
+        if (id <= 251) return 2;
+        if (id <= 386) return 3;
+        if (id <= 493) return 4;
+        if (id <= 649) return 5;
+        if (id <= 721) return 6;
+        if (id <= 809) return 7;
+        if (id <= 905) return 8;
+        return 9;
     }
 
     // -------- Helpers généraux --------
@@ -252,17 +313,20 @@ public class FiltrerFragment extends Fragment {
         return e == null ? null : e.getText().toString();
     }
 
-    private String safe(Object o) {
-        return o == null ? "" : o.toString().trim();
-    }
-
     private double parseOrDefault(String s, double def) {
         try {
             if (s == null) return def;
-            s = s.trim().replace(',', '.'); // accepte virgule
+            s = s.trim().replace(',', '.');
             return s.isEmpty() ? def : Double.parseDouble(s);
         } catch (Exception e) {
             return def;
         }
+    }
+
+    private String normalize(String s) {
+        if (s == null) return "";
+        String noAccent = Normalizer.normalize(s, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}+", "");
+        return noAccent.trim().toLowerCase(Locale.ROOT);
     }
 }

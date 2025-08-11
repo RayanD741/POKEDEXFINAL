@@ -18,5 +18,10 @@
     <string name="poids_min_kg">Poids min (kg)</string>
     <string name="poids_max_kg">Poids max (kg)</string>
     <string name="appliquer_les_filtres">Appliquer les filtres</string>
+    <string name="trier_par_num_ro">Trier par numéro</string>
+    <string name="trier_par_num_roF">Trier par numéro</string>
+    <string name="appliquer_les_filtresF">Appliquer les filtres</string>
+    <string name="trier_par_num_roFF">Trier par numéro</string>
+    <string name="appliquer_les_filtresFF">Appliquer les filtres</string>
 
 </resources>

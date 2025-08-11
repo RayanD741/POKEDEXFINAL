@@ -1,4 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
@@ -22,7 +24,8 @@
             android:id="@+id/spinnerType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:minHeight="48dp" />
 
         <!-- Génération -->
         <TextView
@@ -37,6 +40,17 @@
             android:id="@+id/spinnerGeneration"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:minHeight="48dp" />
+
+        <!-- ✅ CheckBox tri (juste sous les spinners, bien visible) -->
+        <CheckBox
+            android:id="@+id/chkTriNumero"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trier par numéro"
+            android:textColor="#000000"
+            android:buttonTint="#5E35B1"
             android:layout_marginBottom="16dp" />
 
         <!-- Poids -->
@@ -59,8 +73,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:hint="Min"
                 android:inputType="numberDecimal"
-                android:hint="Min" />
+                tools:ignore="TouchTargetSizeCheck" />
 
             <View
                 android:layout_width="16dp"
@@ -71,8 +86,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:hint="Max"
                 android:inputType="numberDecimal"
-                android:hint="Max" />
+                tools:ignore="TouchTargetSizeCheck" />
         </LinearLayout>
 
         <!-- Taille -->
@@ -95,8 +111,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:hint="@string/min"
                 android:inputType="numberDecimal"
-                android:hint="@string/min" />
+                tools:ignore="TouchTargetSizeCheck" />
 
             <View
                 android:layout_width="16dp"
@@ -107,8 +124,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:hint="Max"
                 android:inputType="numberDecimal"
-                android:hint="Max" />
+                tools:ignore="TouchTargetSizeCheck" />
         </LinearLayout>
 
         <!-- Bouton -->
@@ -120,14 +138,15 @@
             android:layout_gravity="center_horizontal"
             android:padding="12dp"
             android:textAllCaps="false"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp" />
 
         <!-- Résultats -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerFiltre"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
 
     </LinearLayout>
 </ScrollView>
